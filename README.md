@@ -1,4 +1,5 @@
 # Heartbeat monitor 
+![API E2E Tests badge](https://github.com/dani-beltran/heartbeat-monitor/actions/workflows/build-and-test.yml/badge.svg)
 
 Different client applications will periodically send heartbeats to this service, and the service keeps track of them, periodically removing those that didn't send any heartbeats in some configured time frame.
 
