@@ -6,6 +6,8 @@ Different client applications will periodically send heartbeats to this service,
 The default heartbeat timeout is 60 seconds, but can be configurable changing the
 environment variable HEARTBEAT_TIMEOUT which is in milliseconds.
 
+[API Reference](API.md)
+
 ## Getting started
 
 Install dependencies
