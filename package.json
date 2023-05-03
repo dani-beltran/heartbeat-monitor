@@ -8,6 +8,7 @@
     "start": "dotenv -e .env node out/bin/serve",
     "start:db": "docker-compose up -d",
     "stop:db": "docker-compose down",
+    "start:cronjob": "dotenv -e .env node out/bin/cron-cleaner",
     "dev": "npm run clean && tsc -w",
     "lint": "eslint --ext=.js,.ts --cache .",
     "clean": "rm -rf out",
@@ -31,13 +32,15 @@
     "inversify": "^6.0.1",
     "koa": "^2.14.2",
     "mesh-ioc": "^3.2.0",
-    "mongodb": "^5.3.0"
+    "mongodb": "^5.3.0",
+    "node-cron": "^3.0.2"
   },
   "devDependencies": {
     "@nodescript/eslint-config": "^1.0.4",
     "@types/axios": "^0.14.0",
     "@types/mocha": "^10.0.1",
     "@types/node": "^18.16.3",
+    "@types/node-cron": "^3.0.7",
     "axios": "^1.4.0",
     "dotenv-cli": "^7.2.1",
     "eslint": "^8.39.0",

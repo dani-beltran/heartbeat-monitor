@@ -62,5 +62,11 @@ we can have situations where expired data is still present in the DB, so this
 require that in the service API we filter expired data out when querying from 
 the DB and that's what it's implemented in my approach.
 
+There's an example of a cronjob for this task in `src/bin/cron-cleaner.ts`. 
+It ca be run with:
+```bash
+npm run start:cronjob
+```
+
 ### Tests
 The tests available are E2E tests of the endpoints to test the whole system.
