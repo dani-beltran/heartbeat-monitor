@@ -1,7 +1,7 @@
 import { MongoDb } from '@ubio/framework/modules/mongodb';
 import { dep } from 'mesh-ioc';
 
-type AppGroup = {
+export type AppGroup = {
     _id?: string;
     id: string;
     group: string;
@@ -27,6 +27,11 @@ export class AppGroupRepo {
       return this.collection.findOne({ id });
   }
 
+  /**
+   * This method registers an app instance in a group.
+   * If the app instance is already registered, it will be updated.
+   * @returns The registered app instance.
+   */
   async register(item: AppGroupRegisterParams): Promise<AppGroup> {
       const updatedAt = new Date();
       const res = await this.collection.findOneAndUpdate({ id: item.id }, {
@@ -34,5 +39,14 @@ export class AppGroupRepo {
           $setOnInsert: { createdAt: new Date() }
       }, { upsert: true, returnDocument: 'after' });
       return { ...res.value, _id: undefined } as AppGroup;
+  }
+
+  /**
+   * This method unregisters an app instance from a group.
+   * If the app is not registered, nothing happens.
+   */
+  async unregister(id: string, group: string) {
+      const res = await this.collection.findOneAndDelete({ id, group });
+      return res.value;
   }
 }

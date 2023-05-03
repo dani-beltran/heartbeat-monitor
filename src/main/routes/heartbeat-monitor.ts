@@ -49,6 +49,7 @@ export class HeartbeatMonitorRouter extends Router {
 
   /**
    * This endpoint registers an app instance in a group.
+   * If the app instance is already registered, it will be updated.
    * Meta data can be provided in the request body.
    */
   @Post({
@@ -77,6 +78,10 @@ export class HeartbeatMonitorRouter extends Router {
       return item;
   }
 
+  /**
+   * This endpoint unregisters an app instance from a group. If the app is not
+   * registered, it will return a 200 status anyway.
+   */
   @Delete({
       path: '/{group}/{id}',
       responses: {
@@ -90,7 +95,10 @@ export class HeartbeatMonitorRouter extends Router {
           },
       },
   })
-  async deleteApp() {
-      return { status: 'Deregister an app instance in a group' };
+  async deleteApp(
+    @PathParam('group', { schema: { type: 'string' } }) group: string,
+    @PathParam('id', { schema: { type: 'string', format: 'uuid' } }) id: string,
+  ) {
+      await this.appGroup.unregister(id, group);
   }
 }
