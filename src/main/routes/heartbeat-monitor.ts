@@ -13,6 +13,10 @@ export class HeartbeatMonitorRouter extends Router {
   @dep() storage!: StorageService;
   @dep() appGroup!: AppGroupRepo;
 
+  /**
+   * This endpoint returns the list of app groups.
+   * @param limit The maximum number of app groups to return.
+   */
   @Get({
       path: '/',
       responses: {
@@ -32,6 +36,9 @@ export class HeartbeatMonitorRouter extends Router {
       return this.appGroup.list(limit);
   }
 
+  /**
+   * This endpoint returns the list of app instances within a group.
+   */
   @Get({
       path: '/{group}',
       responses: {
@@ -52,7 +59,9 @@ export class HeartbeatMonitorRouter extends Router {
   /**
    * This endpoint registers an app instance in a group.
    * If the app instance is already registered, it will be updated.
-   * Meta data can be provided in the request body.
+   * @param group The group name.
+   * @param id The app instance id.
+   * @param meta The meta data to be stored with the app instance.
    */
   @Post({
       path: '/{group}/{id}',
@@ -83,6 +92,8 @@ export class HeartbeatMonitorRouter extends Router {
   /**
    * This endpoint unregisters an app instance from a group. If the app is not
    * registered, it will return a 200 status anyway.
+   * @param group The group name.
+   * @param id The app instance id.
    */
   @Delete({
       path: '/{group}/{id}',
