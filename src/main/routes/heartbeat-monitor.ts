@@ -4,6 +4,21 @@ import { dep } from 'mesh-ioc';
 import { AppGroupRepo } from '../repositories/app-group.js';
 import { StorageService } from '../services/storage-service.js';
 
+const appInstanceSchema = {
+    id: { type: 'string' },
+    group: { type: 'string' },
+    createdAt: { type: 'string', format: 'date-time' },
+    updatedAt: { type: 'string', format: 'date-time' },
+    meta: { type: 'object' },
+};
+
+const groupSchema = {
+    group: { type: 'string' },
+    instances: { type: 'number' },
+    createdAt: { type: 'string', format: 'date-time' },
+    updatedAt: { type: 'string', format: 'date-time' }
+};
+
 /**
  * @title Heartbeat Monitor Router
  * @description This router provide the endpoints responsible for monitoring
@@ -14,7 +29,8 @@ export class HeartbeatMonitorRouter extends Router {
   @dep() appGroup!: AppGroupRepo;
 
   /**
-   * This endpoint returns the list of app groups.
+   * This endpoint returns the list of app groups. The number of app instances of each
+   * group will only consider the active app instances (the ones that have sent a heartbeat recently).
    * @param limit The maximum number of app groups to return.
    */
   @Get({
@@ -22,12 +38,10 @@ export class HeartbeatMonitorRouter extends Router {
       responses: {
           200: {
               schema: {
-                  type: 'object',
-                  properties: {
-                      group: { type: 'string' },
-                      instances: { type: 'number' },
-                      createdAt: { type: 'string', format: 'date-time' },
-                      updatedAt: { type: 'string', format: 'date-time' }
+                  type: 'array',
+                  items: {
+                      type: 'object',
+                      properties: groupSchema
                   },
               },
           },
@@ -40,23 +54,27 @@ export class HeartbeatMonitorRouter extends Router {
   }
 
   /**
-   * This endpoint returns the list of app instances within a group.
+   * This endpoint returns the list of active app instances within a group.
    */
   @Get({
       path: '/{group}',
       responses: {
           200: {
               schema: {
-                  type: 'object',
-                  properties: {
-                      status: { type: 'string' },
+                  type: 'array',
+                  items: {
+                      type: 'object',
+                      properties: appInstanceSchema
                   },
               },
           },
       },
   })
-  async listAppInstances() {
-      return { status: 'List apps within a group' };
+  async listAppInstances(
+    @PathParam('group', { schema: { type: 'string' } }) group: string,
+    @QueryParam('limit', { schema: { type: 'number', default: 1000 } }) limit: number
+  ) {
+      return this.appGroup.get(group, limit);
   }
 
   /**
@@ -72,13 +90,7 @@ export class HeartbeatMonitorRouter extends Router {
           200: {
               schema: {
                   type: 'object',
-                  properties: {
-                      id: { type: 'string' },
-                      group: { type: 'string' },
-                      createdAt: { type: 'string', format: 'date-time' },
-                      updatedAt: { type: 'string', format: 'date-time' },
-                      meta: { type: 'object' },
-                  },
+                  properties: appInstanceSchema
               },
           },
       },

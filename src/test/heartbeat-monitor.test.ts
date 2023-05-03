@@ -166,9 +166,60 @@ describe('heartbeat-monitor', () => {
     });
 
     describe('GET /:group', () => {
+        const group = 'just-another-test-group';
+
+        const tenSecondsAgo = new Date(Date.now() - 1000 * 10);
+        const fiveSecondsAgo = new Date(Date.now() - 1000 * 5);
+        const oneSecondsAgo = new Date(Date.now() - 1000 * 1);
+        const expiredDate = new Date(Date.now() - 1000 * 60 * 60 * 24 * 30);
+        before(async () => {
+            await testApp.mongodb.db.collection('app_groups').deleteMany({});
+            await testApp.mongodb.db.collection('app_groups').insertMany([
+                {
+                    id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a16',
+                    group,
+                    createdAt: tenSecondsAgo,
+                    updatedAt: fiveSecondsAgo,
+                    meta: { foo: 'bar' },
+                },
+                {
+                    id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a17',
+                    group,
+                    createdAt: fiveSecondsAgo,
+                    updatedAt: oneSecondsAgo,
+                    meta: { foo: 'bar' },
+                },
+                {
+                    id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a18',
+                    group,
+                    createdAt: tenSecondsAgo,
+                    updatedAt: tenSecondsAgo,
+                },
+                {
+                    id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a19',
+                    group,
+                    createdAt: expiredDate,
+                    updatedAt: expiredDate,
+                }
+            ]);
+        });
+
         it('should return 200', async () => {
-            const response = await axios.get(baseURL + '/test-group');
-            expect(response.data).to.include({ status: 'List apps within a group' });
+            const response = await axios.get(baseURL + `/${group}`);
+            // Test that only active apps are returned
+            expect(response.data.length).to.eq(3);
+            // Test that the apps are ordered by last heartbeat (updatedAt)
+            expect(response.data[0].id).to.eq('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a17');
+            expect(response.data[1].id).to.eq('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a16');
+            expect(response.data[2].id).to.eq('a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a18');
+            // Test the right data is returned
+            expect(response.data[0]).to.deep.eq({
+                id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a17',
+                group,
+                createdAt: fiveSecondsAgo.toISOString(),
+                updatedAt: oneSecondsAgo.toISOString(),
+                meta: { foo: 'bar' },
+            });
         });
     });
 });

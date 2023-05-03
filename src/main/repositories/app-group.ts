@@ -55,7 +55,7 @@ export class AppGroupRepo {
                       group: '$_id',
                       instances: '$count',
                       createdAt: 1,
-                      updatedAt: 1
+                      updatedAt: 1,
                   },
               },
           ])
@@ -63,8 +63,24 @@ export class AppGroupRepo {
       return res as Group[];
   }
 
-  async get(id: string) {
-      return this.collection.findOne({ id });
+  /**
+   * @param group the group name
+   * @returns an array of active app instances within the group sorted by the last heartbeat.
+   *  With active apps we mean the apps that have sent a heartbeat recently.
+   */
+  async get(group: string, limit = 100) {
+      const res = await this.collection
+          .find({
+              group,
+              updatedAt: {
+                  $gt: new Date(Date.now() - this.storage.HEARTBEAT_TIMEOUT),
+              },
+          })
+          .sort('updatedAt', -1)
+          .project({ _id: 0 })
+          .limit(limit)
+          .toArray();
+      return res as AppInstance[];
   }
 
   /**
@@ -72,7 +88,9 @@ export class AppGroupRepo {
    * If the app instance is already registered, it will be updated.
    * @returns The registered app instance.
    */
-  async register(item: Omit<AppInstance, 'createdAt' | 'updatedAt'>): Promise<AppInstance> {
+  async register(
+    item: Omit<AppInstance, 'createdAt' | 'updatedAt'>
+  ): Promise<AppInstance> {
       const updatedAt = new Date();
       const res = await this.collection.findOneAndUpdate(
           { id: item.id },
@@ -80,9 +98,13 @@ export class AppGroupRepo {
               $set: { ...item, updatedAt },
               $setOnInsert: { createdAt: new Date() },
           },
-          { upsert: true, returnDocument: 'after' }
+          {
+              upsert: true,
+              returnDocument: 'after',
+              projection: { _id: 0 },
+          }
       );
-      return { ...res.value, _id: undefined } as AppInstance;
+      return (<unknown>res.value) as AppInstance;
   }
 
   /**
