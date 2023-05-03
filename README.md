@@ -52,7 +52,7 @@ variable HEARTBEAT_TIMEOUT which is in milliseconds.
 Because this service needs to scale horizontally and it only has one DB instance,
 to trigger the removing of the data from each service instance would be inefficient.
 Imagine the situation where we have 1000 load balanced instances of this service and all of them 
-trigger calls to the DB to delete the expire data repeatedly, most of those call will be redundant.
+trigger calls to the DB to delete the expire data repeatedly, most of those calls will be redundant.
 
 One better solution could be to setup a separate cronjob process that runs periodically, 
 lets say, every couple of minutes, and deletes the expired data. This way only the
