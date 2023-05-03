@@ -11,6 +11,11 @@ Install dependencies
 npm install
 ```
 
+Run MondoDB (You will need Docker and docker-compose in your system)
+```bash
+npm run start:db
+```
+
 Start the compiler in watch mode
 ```bash
 npm run dev
