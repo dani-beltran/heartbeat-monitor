@@ -24,7 +24,10 @@ export class HeartbeatMonitorRouter extends Router {
               schema: {
                   type: 'object',
                   properties: {
-                      status: { type: 'string' },
+                      group: { type: 'string' },
+                      instances: { type: 'number' },
+                      createdAt: { type: 'string', format: 'date-time' },
+                      updatedAt: { type: 'string', format: 'date-time' }
                   },
               },
           },
@@ -70,7 +73,11 @@ export class HeartbeatMonitorRouter extends Router {
               schema: {
                   type: 'object',
                   properties: {
-                      status: { type: 'string' },
+                      id: { type: 'string' },
+                      group: { type: 'string' },
+                      createdAt: { type: 'string', format: 'date-time' },
+                      updatedAt: { type: 'string', format: 'date-time' },
+                      meta: { type: 'object' },
                   },
               },
           },
@@ -99,12 +106,7 @@ export class HeartbeatMonitorRouter extends Router {
       path: '/{group}/{id}',
       responses: {
           200: {
-              schema: {
-                  type: 'object',
-                  properties: {
-                      status: { type: 'string' },
-                  },
-              },
+              schema: {},
           },
       },
   })
