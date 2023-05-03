@@ -1,4 +1,4 @@
-import { BodyParam, Delete, Get, PathParam, Post, Router } from '@ubio/framework';
+import { BodyParam, Delete, Get, PathParam, Post, QueryParam, Router } from '@ubio/framework';
 import { dep } from 'mesh-ioc';
 
 import { AppGroupRepo } from '../repositories/app-group.js';
@@ -26,8 +26,10 @@ export class HeartbeatMonitorRouter extends Router {
           },
       },
   })
-  async listAppGroups() {
-      return { status: 'List app groups' };
+  async listAppGroups(
+    @QueryParam('limit', { schema: { type: 'number', default: 1000 } }) limit: number
+  ) {
+      return this.appGroup.list(limit);
   }
 
   @Get({

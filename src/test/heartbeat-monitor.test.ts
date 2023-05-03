@@ -109,9 +109,59 @@ describe('heartbeat-monitor', () => {
     });
 
     describe('GET /', () => {
-        it('should return 200', async () => {
+        const tenSecondsAgo = new Date(Date.now() - 1000 * 10);
+        const fiveSecondsAgo = new Date(Date.now() - 1000 * 5);
+        const oneSecondsAgo = new Date(Date.now() - 1000 * 1);
+        const expiredDate = new Date(Date.now() - 1000 * 60 * 60 * 24 * 30);
+        before(async () => {
+            await testApp.mongodb.db.collection('app_groups').deleteMany({});
+            await testApp.mongodb.db.collection('app_groups').insertMany([
+                {
+                    id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a16',
+                    group: 'test-group',
+                    createdAt: tenSecondsAgo,
+                    updatedAt: fiveSecondsAgo,
+                    meta: { foo: 'bar' },
+                },
+                {
+                    id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a17',
+                    group: 'test-group',
+                    createdAt: fiveSecondsAgo,
+                    updatedAt: oneSecondsAgo,
+                    meta: { foo: 'bar' },
+                },
+                {
+                    id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a18',
+                    group: 'another-test-group',
+                    createdAt: new Date(),
+                    updatedAt: new Date(),
+                },
+                {
+                    id: 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a19',
+                    group: 'empty-test-group',
+                    createdAt: expiredDate,
+                    updatedAt: expiredDate,
+                }
+            ]);
+        });
+
+        it('should return 200 and the results', async () => {
             const response = await axios.get(baseURL + '/');
-            expect(response.data).to.include({ status: 'List app groups' });
+            // Test the results are sorted by number instances from most to least
+            expect(response.data[0].group).to.eq('test-group');
+            expect(response.data[0].instances).to.eq(2);
+            expect(response.data[1].group).to.eq('another-test-group');
+            expect(response.data[1].instances).to.eq(1);
+            // Test that the results return the older createdAt date for the group
+            expect(response.data[0].createdAt).to.eq(tenSecondsAgo.toISOString());
+            expect(response.data[0].updatedAt).to.eq(oneSecondsAgo.toISOString());
+            // Test that groups without recent heartbeats do not appear
+            expect(response.data).to.not.deep.include({
+                instances: 1,
+                group: 'empty-test-group',
+                createdAt: expiredDate,
+                updatedAt: expiredDate,
+            });
         });
     });
 
