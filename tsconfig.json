@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+      "target": "ES2020",
+      "module": "ESNext",
+      "moduleResolution": "NodeNext",
+      "strict": true,
+      "declaration": true,
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
+      "removeComments": true,
+      "resolveJsonModule": true,
+      "sourceMap": true,
+      "noImplicitOverride": true,
+      "esModuleInterop": true,
+      // "allowSyntheticDefaultImports": true,
+      "skipLibCheck": true,
+      "outDir": "./out",
+      "rootDir": "./src",
+  },
+  "include": [
+      "src",
+  ]
+}

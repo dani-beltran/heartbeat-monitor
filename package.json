@@ -1,0 +1,44 @@
+{
+  "name": "be-tech-test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "out/bin/serve.js",
+  "type": "module",
+  "scripts": {
+    "start": "node out/bin/serve",
+    "dev": "npm run clean && tsc -w",
+    "lint": "eslint --ext=.js,.ts --cache .",
+    "clean": "rm -rf out",
+    "compile": "npm run clean && tsc",
+    "test": "NODE_ENV=test mocha ./out/test/**/*.test.js",
+    "docs": "npm run docs:openapi && npm run docs:api",
+    "docs:openapi": "generate-openapi > openapi.json",
+    "docs:api": "generate-docs > API.md",
+    "preversion": "npm run lint && npm run compile && npm run docs && git add openapi.json API.md",
+    "postversion": "git push origin $(git rev-parse --abbrev-ref HEAD) --tags"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/chai": "^4.3.5",
+    "@types/koa": "^2.13.6",
+    "@ubio/framework": "^15.3.0",
+    "chai": "^4.3.7",
+    "dotenv": "^16.0.3",
+    "inversify": "^6.0.1",
+    "koa": "^2.14.2",
+    "mesh-ioc": "^3.2.0"
+  },
+  "devDependencies": {
+    "@nodescript/eslint-config": "^1.0.4",
+    "@types/axios": "^0.14.0",
+    "@types/mocha": "^10.0.1",
+    "@types/node": "^18.16.3",
+    "axios": "^1.4.0",
+    "eslint": "^8.39.0",
+    "mocha": "^10.2.0",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.0.4"
+  }
+}
