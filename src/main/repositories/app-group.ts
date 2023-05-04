@@ -4,7 +4,6 @@ import { dep } from 'mesh-ioc';
 import { StorageService } from '../services/storage-service.js';
 
 export type AppInstance = {
-    _id?: string;
     id: string;
     group: string;
     createdAt: Date;
