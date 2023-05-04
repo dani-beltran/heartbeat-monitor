@@ -33,10 +33,10 @@ export class AppGroupRepo {
    * The array is sorted by the number of apps in descending order.
    */
   async list(limit = 100): Promise<Group[]> {
-      const beforeTimeout = new Date(Date.now() - this.storage.HEARTBEAT_TIMEOUT);
+      const expiredAgeDate = new Date(Date.now() - this.storage.HEARTBEAT_TIMEOUT);
       const res = await this.collection
           .aggregate([
-              { $match: { updatedAt: { $gt: beforeTimeout } } },
+              { $match: { updatedAt: { $gt: expiredAgeDate } } },
               {
                   $group: {
                       _id: '$group',
@@ -68,11 +68,12 @@ export class AppGroupRepo {
    *  With active apps we mean the apps that have sent a heartbeat recently.
    */
   async get(group: string, limit = 100) {
+      const expiredAgeDate = new Date(Date.now() - this.storage.HEARTBEAT_TIMEOUT);
       const res = await this.collection
           .find({
               group,
               updatedAt: {
-                  $gt: new Date(Date.now() - this.storage.HEARTBEAT_TIMEOUT),
+                  $gt: expiredAgeDate,
               },
           })
           .sort('updatedAt', -1)
