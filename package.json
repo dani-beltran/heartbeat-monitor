@@ -1,5 +1,5 @@
 {
-  "name": "be-tech-test",
+  "name": "heartbeat-monitor",
   "version": "1.0.0",
   "description": "",
   "main": "out/bin/serve.js",
